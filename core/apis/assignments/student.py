@@ -26,7 +26,7 @@ def upsert_assignment(p, incoming_payload):
     assignment.student_id = p.student_id
 
     upserted_assignment = Assignment.upsert(assignment)
-    db.session.commit()
+    db.session().commit()
     upserted_assignment_dump = AssignmentSchema().dump(upserted_assignment)
     return APIResponse.respond(data=upserted_assignment_dump)
 
@@ -43,6 +43,6 @@ def submit_assignment(p, incoming_payload):
         teacher_id=submit_assignment_payload.teacher_id,
         auth_principal=p
     )
-    db.session.commit()
+    db.session().commit()
     submitted_assignment_dump = AssignmentSchema().dump(submitted_assignment)
     return APIResponse.respond(data=submitted_assignment_dump)
