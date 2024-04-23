@@ -5,7 +5,7 @@ from core.libs import helpers, assertions
 from core.models.teachers import Teacher
 from core.models.students import Student
 from sqlalchemy.types import Enum as BaseEnum
-from sqlalchemy import Integer,Column,ForeignKey,Text,Sequence,TIMESTAMP
+from sqlalchemy import or_
 from core.libs.exceptions import FyleError
 
 class GradeEnum(str, enum.Enum):
@@ -70,14 +70,12 @@ class Assignment(db.Model):
         assertions.assert_valid(assignment.content is not None, 'assignment with empty content cannot be submitted')
 
         if assignment.state == AssignmentStateEnum.SUBMITTED:
-            assertions.assert_valid(False, 'a Drafted Assignment can only be submitted to the teacher')
+            assertions.assert_valid(False, 'only a draft assignment can be submitted')
         else:
             assignment.teacher_id = teacher_id
             assignment.state = AssignmentStateEnum.SUBMITTED
             db.session.flush()
             return assignment
-
-        return assignment
 
 
     @classmethod
@@ -104,5 +102,10 @@ class Assignment(db.Model):
         return cls.filter(cls.student_id == student_id).all()
 
     @classmethod
-    def get_assignments_by_teacher(cls):
-        return cls.query.all()
+    def get_assignments_by_teacher(cls, teacher_id):
+        return cls.query.filter(cls.teacher_id == teacher_id).all()
+
+    @classmethod
+    def list_all_graded_submitted_assignments(cls):
+        return cls.query.filter(
+            or_(cls.state == AssignmentStateEnum.SUBMITTED, cls.state == AssignmentStateEnum.GRADED)).all()

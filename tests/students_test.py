@@ -102,3 +102,10 @@ def test_edit_draft_assignment(client, h_student_1):
     assert data['content'] == 'ALTERED'
     assert data['state'] == 'DRAFT'
     assert data['teacher_id'] is None
+
+def core_home(client):
+    response = client.post(
+        '/'
+    )
+
+    assert response.status_code == 200
