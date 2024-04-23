@@ -23,21 +23,21 @@ class AssignmentStateEnum(str, enum.Enum):
 
 class Assignment(db.Model):
     __tablename__ = 'assignments'
-    id = Column(Integer, Sequence('assignments_id_seq'), primary_key=True)
-    student_id = Column(Integer, ForeignKey(Student.id), nullable=False)
-    teacher_id = Column(Integer, ForeignKey(Teacher.id), nullable=True)
-    content = Column(Text)
-    grade = Column(BaseEnum(GradeEnum))
-    state = Column(BaseEnum(AssignmentStateEnum), default=AssignmentStateEnum.DRAFT, nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True), default=helpers.get_utc_now, nullable=False)
-    updated_at = Column(TIMESTAMP(timezone=True), default=helpers.get_utc_now, nullable=False, onupdate=helpers.get_utc_now)
+    id = db.Column(db.Integer, db.Sequence('assignments_id_seq'), primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey(Student.id), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey(Teacher.id), nullable=True)
+    content = db.Column(db.Text)
+    grade = db.Column(BaseEnum(GradeEnum))
+    state = db.Column(BaseEnum(AssignmentStateEnum), default=AssignmentStateEnum.DRAFT, nullable=False)
+    created_at = db.Column(db.TIMESTAMP(timezone=True), default=helpers.get_utc_now, nullable=False)
+    updated_at = db.Column(db.TIMESTAMP(timezone=True), default=helpers.get_utc_now, nullable=False, onupdate=helpers.get_utc_now)
 
     def __repr__(self):
         return '<Assignment %r>' % self.id
 
     @classmethod
     def filter(cls, *criterion):
-        db_query = db.session().query(cls)
+        db_query = db.session.query(cls)
         return db_query.filter(*criterion)
 
     @classmethod
@@ -57,9 +57,9 @@ class Assignment(db.Model):
         else:
             assignment = assignment_new
             assertions.assert_valid(assignment.content is not None, 'assignment with empty content cannot be posted')
-            db.session().add(assignment_new)
+            db.session.add(assignment_new)
 
-        db.session().flush()
+        db.session.flush()
         return assignment
 
     @classmethod
@@ -74,7 +74,7 @@ class Assignment(db.Model):
         else:
             assignment.teacher_id = teacher_id
             assignment.state = AssignmentStateEnum.SUBMITTED
-            db.session().flush()
+            db.session.flush()
             return assignment
 
         return assignment
@@ -95,7 +95,7 @@ class Assignment(db.Model):
 
         assignment.grade = grade
         assignment.state = AssignmentStateEnum.GRADED
-        db.session().flush()
+        db.session.flush()
 
         return assignment
 
