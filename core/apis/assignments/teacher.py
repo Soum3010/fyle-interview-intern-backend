@@ -36,6 +36,6 @@ def grade_assignment(p, incoming_payload):
             grade=grade_assignment_payload.grade,
             auth_principal=p
         )
-        db.session().commit()
+        db.session.commit()
         graded_assignment_dump = AssignmentSchema().dump(graded_assignment)
         return APIResponse.respond(data=graded_assignment_dump)
